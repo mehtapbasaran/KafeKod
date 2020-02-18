@@ -14,7 +14,16 @@ namespace KafeKod.Data
         public DateTime? KapanisZamani { get; set; }
         public SiparisDurum Durum { get; set; }
         public List<SiparisDetay> SiparisDetaylar { get; set; }
-        public string toplamTutarTL => string.Format("{0:0.00}₺", ToplamTutar());
+        //public string toplamTutarTL => string.Format("{0:0.00}₺", ToplamTutar());
+        public string ToplamTutarTL
+        {
+            get
+            {
+                return string.Format("{0:0.00}₺", ToplamTutar());
+
+            }
+
+        }
 
         public decimal ToplamTutar()=> SiparisDetaylar.Sum(x => x.Tutar());
         

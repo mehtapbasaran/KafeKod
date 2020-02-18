@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace KafeKod.Data
 {
-   public  class SiparisDetay
+    public class SiparisDetay
     {
         public string UrunAd { get; set; }
         public decimal BirimFiyat { get; set; }
         public int Adet { get; set; }
 
         public decimal Tutar() => Adet * BirimFiyat;
-
+        //{
+        //return Adet*BirimFiyat
+        //    }
     }
 }
