@@ -8,7 +8,7 @@ namespace KafeKod.Data
 {
     public class Urun
     {
-        public int UrunAd { get; set; }
+        public string UrunAd { get; set; }
         public decimal BirimFiyat { get; set; }
         public override string ToString()
         {
