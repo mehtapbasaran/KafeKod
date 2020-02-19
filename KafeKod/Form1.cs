@@ -1,9 +1,11 @@
 ﻿using KafeKod.Data;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,30 +16,46 @@ namespace KafeKod
     public partial class Form1 : Form
     {
         Kafeveri db;
-        int masaAdet = 20;
         
+
 
         public Form1()
         {
-            db = new Kafeveri();
-           
-            OrnekVerileriYukle();
+            VerileriOku();
+           // db = new Kafeveri();
+
+            //OrnekVerileriYukle();
             InitializeComponent();
             MasalariOlustur();
-       
+
         }
 
-        private void OrnekVerileriYukle()
+        private void VerileriOku()
         {
-            db.Urunler = new List<Urun>
+            try
             {
-                new Urun {UrunAd = "Kola", BirimFiyat =6.99m },
+                string json = File.ReadAllText("veri.json");
+                db = JsonConvert.DeserializeObject<Kafeveri>(json);
+            }
+            catch (Exception)
+            {
 
-                new Urun {UrunAd = "Çay", BirimFiyat =3.99m },
-
-            };
-            
+                db = new Kafeveri();
+            }
         }
+
+        //private void OrnekVerileriYukle()
+        //{
+        //    db.Urunler = new List<Urun>
+        //    {
+        //        new Urun {UrunAd = "Kola", BirimFiyat =6.99m },
+
+        //        new Urun {UrunAd = "Çay", BirimFiyat =3.99m },
+
+        //    };
+        //    db.Urunler.Sort();
+
+        //}
 
         private void MasalariOlustur()
         {
@@ -45,17 +63,40 @@ namespace KafeKod
             ImageList il = new ImageList();
             il.Images.Add("bos", Properties.Resources.masabos);
             il.Images.Add("dolu", Properties.Resources.masadolu);
-            il.ImageSize = new Size(64,64);
+            il.ImageSize = new Size(64, 64);
             lvwMasalar.LargeImageList = il;
 
             #endregion
 
             ListViewItem lvi;
-            for (int i = 1; i <= masaAdet; i++)
+            for (int i = 1; i <= db.MasaAdet; i++)
             {
-                lvi = new ListViewItem("Masa"+i);
-                lvi.Tag = i;
-                lvi.ImageKey = "bos";
+                lvi = new ListViewItem("Masa" + i);
+                //masa no değeriyle kayıtlı bir sipariş var mı?
+                Siparis sip = db.AktifSiparisler.FirstOrDefault(x => x.MasaNo == i);
+
+
+                //Siparis sip = null;
+                //foreach (Siparis x in db.AktifSiparisler)
+                //{
+                //    if (x.MasaNo == i)
+                //    {
+                //        sip = x;
+                //        break;
+                //    }
+                //}
+
+                if (sip==null)
+                {
+                    lvi.Tag = i;
+                    lvi.ImageKey = "bos";
+                }
+                else
+                {
+                lvi.Tag = sip;
+                lvi.ImageKey = "dolu";
+
+                }
                 lvwMasalar.Items.Add(lvi);
 
             }
@@ -63,7 +104,7 @@ namespace KafeKod
 
         private void lvwMasalar_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (e.Button==MouseButtons.Left)
+            if (e.Button == MouseButtons.Left)
             {
                 var lvi = lvwMasalar.SelectedItems[0];
                 lvi.ImageKey = "dolu";
@@ -73,7 +114,7 @@ namespace KafeKod
                 if (lvi.Tag is Siparis)
                 {
                     sip = (Siparis)lvi.Tag;
-                    
+
                 }
                 else
                 {
@@ -85,6 +126,7 @@ namespace KafeKod
                 }
 
                 SiparisForm frmSiparis = new SiparisForm(db, sip);
+                frmSiparis.MasaTasindi += FrmSiparis_MasaTasindi;
                 frmSiparis.ShowDialog();
 
                 if (sip.Durum == SiparisDurum.Odendi || sip.Durum == SiparisDurum.Iptal)
@@ -97,10 +139,38 @@ namespace KafeKod
             }
         }
 
+        private void FrmSiparis_MasaTasindi(object sender, MasaTasimaEventArgs e)
+        {
+            //adım1: eski masayı boşalt
+            ListViewItem lviEskiMasa = null;
+            foreach (ListView item in lvwMasalar.Items)
+            {
+                if (item.Tag== e.TasinanSiparis)
+                {
+                    lviEskiMasa = item;
+                    break;
+                }
+            }
+           
+            //adım2: yeni masaya siparişi koy
+        }
+
         private void tsmiGecmisSiparisler_Click(object sender, EventArgs e)
         {
             var frm = new GecmisSiparisler(db);
             frm.ShowDialog();
+        }
+
+        private void tsmiUrunler_Click(object sender, EventArgs e)
+        {
+            var frm = new UrunlerForm(db);
+            frm.ShowDialog();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            string json = JsonConvert.SerializeObject(db);
+            File.WriteAllText("veri.json", json);
         }
     }
 }
