@@ -13,7 +13,7 @@ namespace KafeKod
 {
     public partial class SiparisForm : Form
     {
-        public event EventHandler<MasaTasimaEventArgs> MasaTasindi;
+        public event EventHandler<MasaTasimaEventArgs> MasaTasiniyor;
         Kafeveri db;
         Siparis siparis;
         BindingList<SiparisDetay> blSiparisDetaylar;
@@ -162,11 +162,7 @@ namespace KafeKod
             }
             int eskiMasaNo = siparis.MasaNo;
             int hedefMasaNo = (int)cboMasaNo.SelectedItem;
-            siparis.MasaNo = hedefMasaNo;
-            MasaNoGuncelle();
-            MasaNolariYukle();
-
-            if (MasaTasindi !=null)
+            if (MasaTasiniyor != null)
             {
                 var args = new MasaTasimaEventArgs
                 {
@@ -176,9 +172,14 @@ namespace KafeKod
 
 
                 };
-                MasaTasindi(this, args);
+                MasaTasiniyor(this, args);
 
             }
+            siparis.MasaNo = hedefMasaNo;
+            MasaNoGuncelle();
+            MasaNolariYukle();
+
+            
 
         }
     }
