@@ -14,12 +14,12 @@ namespace KafeKod
     public partial class SiparisForm : Form
     {
         public event EventHandler<MasaTasimaEventArgs> MasaTasiniyor;
-        Kafeveri db;
+        KafeContext db;
         Siparis siparis;
         BindingList<SiparisDetay> blSiparisDetaylar;
         private object lblOdemeTutar;
 
-        public SiparisForm(Kafeveri kafeVeri, Siparis siparis)
+        public SiparisForm(KafeContext kafeVeri, Siparis siparis)
         {
             db = kafeVeri;
             this.siparis = siparis;

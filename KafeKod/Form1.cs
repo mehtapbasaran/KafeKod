@@ -15,7 +15,7 @@ namespace KafeKod
 {
     public partial class Form1 : Form
     {
-        Kafeveri db;
+        KafeContext db;
         
 
 
@@ -35,12 +35,12 @@ namespace KafeKod
             try
             {
                 string json = File.ReadAllText("veri.json");
-                db = JsonConvert.DeserializeObject<Kafeveri>(json);
+                db = JsonConvert.DeserializeObject<KafeContext>(json);
             }
             catch (Exception)
             {
 
-                db = new Kafeveri();
+                db = new KafeContext();
             }
         }
 
