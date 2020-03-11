@@ -19,7 +19,7 @@ namespace KafeKod
             db = kafeVeri;
             InitializeComponent();
 
-            dgvSiparisDetaylari.DataSource = db.GecmisSiparisler;
+            dgvSiparisDetaylari.DataSource = db.Siparisler.Where(x => x.Durum != SiparisDurum.Aktif).ToList(); ;
         }
 
         private void dgvSiparisDetaylari_SelectionChanged(object sender, EventArgs e)

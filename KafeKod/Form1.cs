@@ -15,13 +15,14 @@ namespace KafeKod
 {
     public partial class Form1 : Form
     {
-        KafeContext db;
-        
+        KafeContext db = new KafeContext();
+      
+
 
 
         public Form1()
         {
-            VerileriOku();
+            
            // db = new Kafeveri();
 
             //OrnekVerileriYukle();
@@ -44,18 +45,7 @@ namespace KafeKod
             }
         }
 
-        //private void OrnekVerileriYukle()
-        //{
-        //    db.Urunler = new List<Urun>
-        //    {
-        //        new Urun {UrunAd = "Kola", BirimFiyat =6.99m },
-
-        //        new Urun {UrunAd = "Çay", BirimFiyat =3.99m },
-
-        //    };
-        //    db.Urunler.Sort();
-
-        //}
+       
 
         private void MasalariOlustur()
         {
@@ -69,11 +59,11 @@ namespace KafeKod
             #endregion
 
             ListViewItem lvi;
-            for (int i = 1; i <= db.MasaAdet; i++)
+            for (int i = 1; i <= Properties.Settings.Default.MasaAdet; i++)
             {
                 lvi = new ListViewItem("Masa" + i);
                 //masa no değeriyle kayıtlı bir sipariş var mı?
-                Siparis sip = db.AktifSiparisler.FirstOrDefault(x => x.MasaNo == i);
+                Siparis sip = db.Siparisler.FirstOrDefault(x => x.MasaNo == i && x.Durum == SiparisDurum.Aktif);
 
 
                 //Siparis sip = null;
@@ -119,10 +109,12 @@ namespace KafeKod
                 else
                 {
                     sip = new Siparis();
+                    sip.Durum = SiparisDurum.Aktif;
                     sip.MasaNo = (int)lvi.Tag;
                     sip.AcilisZamani = DateTime.Now;
                     lvi.Tag = sip;
-                    db.AktifSiparisler.Add(sip);
+                    db.Siparisler.Add(sip);
+                    db.SaveChanges();
                 }
 
                 SiparisForm frmSiparis = new SiparisForm(db, sip);
@@ -133,8 +125,7 @@ namespace KafeKod
                 {
                     lvi.Tag = sip.MasaNo;
                     lvi.ImageKey = "bos";
-                    db.AktifSiparisler.Remove(sip);
-                    db.GecmisSiparisler.Add(sip);
+                   
                 }
             }
         }
@@ -166,8 +157,7 @@ namespace KafeKod
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            string json = JsonConvert.SerializeObject(db);
-            File.WriteAllText("veri.json", json);
+            db.Dispose();
         }
         private ListViewItem MasaBul(int masaNo)
         {

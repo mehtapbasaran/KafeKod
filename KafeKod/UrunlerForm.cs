@@ -14,15 +14,15 @@ namespace KafeKod
     public partial class UrunlerForm : Form
     {
         KafeContext db;
-        BindingList<Urun> blUrunler;
+
 
         public UrunlerForm(KafeContext kafeVeri)
         {
             db = kafeVeri;
             InitializeComponent();
             dgvUrunler.AutoGenerateColumns = false;
-            blUrunler = new BindingList<Urun>(db.Urunler);
-            dgvUrunler.DataSource = blUrunler;
+
+            dgvUrunler.DataSource = db.Urunler.OrderBy(x => x.UrunAd).ToList();
         }
 
         private void btnUrunEkle_Click(object sender, EventArgs e)
@@ -33,12 +33,13 @@ namespace KafeKod
                 MessageBox.Show("Lütfen bir ürün adı giriniz");
                 return;
             }
-            blUrunler.Add(new Urun
+            db.Urunler.Add(new Urun
             {
                 UrunAd = urunAd,
-                BirimFiyat=nudBirimFiyat.Value
+                BirimFiyat = nudBirimFiyat.Value
             });
-            db.Urunler.Sort();
+            db.SaveChanges();
+            dgvUrunler.DataSource = db.Urunler.OrderBy(x => x.UrunAd).ToList();
 
 
         }
@@ -60,6 +61,7 @@ namespace KafeKod
                 else
                 {
                     dgvUrunler.Rows[e.RowIndex].ErrorText = "";
+                    db.SaveChanges();
                 }
             }
         }
