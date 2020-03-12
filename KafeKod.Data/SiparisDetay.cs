@@ -16,6 +16,7 @@ namespace KafeKod.Data
         public string UrunAd { get; set; }
         public decimal BirimFiyat { get; set; }
         public int Adet { get; set; }
+
         public int UrunId { get; set; }
         public int SiparisId { get; set; }
         public virtual Urun Urun { get; set; }
